@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>8-Puzzle A* Visualizer</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="shell">
+  <aside class="railnav">
+    <div class="brand">AI · DIGITAL ASSIGNMENT<strong>8-Puzzle Visualizer</strong></div>
+    <nav>
+      <a href="index.html" class="active">Home</a>
+      <a href="solver.html">Solver</a>
+      <a href="info.html">Algorithm Info</a>
+    </nav>
+    <div class="meta">Algorithm assigned:<br><span class="mono" style="color:var(--frontier)">A* Search</span></div>
+  </aside>
+
+  <main class="main">
+    <div class="hero">
+      <div class="eyebrow-line">Artificial Intelligence &mdash; Individual Digital Assignment</div>
+      <h1>Interactive 8-Puzzle Problem Solver using AI Search Algorithms</h1>
+      <p class="lede">A state-space search visualizer that solves the classic 8-puzzle with A* search,
+      showing the frontier, explored set, and cost accounting f(n) = g(n) + h(n) at every step of the search.</p>
+    </div>
+
+    <div class="idcard">
+      <div><div class="k">Course</div><div class="v">Artificial Intelligence</div></div>
+      <div><div class="k">Assignment</div><div class="v">8-Puzzle Search Visualizer</div></div>
+      <div><div class="k">Student Name</div><div class="v">Gurpreet</div></div>
+      <div><div class="k">Registration No.</div><div class="v">24BCT0292</div></div>
+    </div>
+
+    <div class="intro-grid">
+      <div>
+        <h2>What is the 8-puzzle?</h2>
+        <p>The 8-puzzle is a sliding tile puzzle played on a 3&times;3 grid holding eight numbered tiles and
+        one blank space. Any tile horizontally or vertically adjacent to the blank can slide into it &mdash;
+        that single move rule is the only action available at every state.</p>
+        <p>Starting from a scrambled arrangement, the goal is to reach a specified target arrangement using
+        the fewest possible slides. Framed as a search problem: each arrangement of the board is a
+        <em>state</em>, each legal slide is an <em>action</em> connecting two states, and solving the puzzle
+        means finding a path through this state space from the initial state to the goal state.</p>
+
+        <h2>Why it matters for search algorithms</h2>
+        <p>The 8-puzzle has a state space of 9!/2 = 181,440 reachable configurations &mdash; small enough to
+        search exhaustively, yet large enough to expose the real difference between blind and heuristic-guided
+        search. It's a standard textbook benchmark for comparing uninformed strategies (BFS, DFS, DLS, IDDFS,
+        UCS) against informed strategies (Greedy Best-First, A*) that use a heuristic function to estimate
+        distance to the goal.</p>
+
+        <h2>This build: A* Search</h2>
+        <p>The algorithm assigned for this submission is <strong>A* Search</strong>. A* expands the node with
+        the lowest evaluation function <code>f(n) = g(n) + h(n)</code>, where g(n) is the exact cost from the
+        start and h(n) is a heuristic estimate of the remaining cost to the goal. The Solver page implements
+        it from scratch with a binary-heap frontier and two selectable heuristics &mdash; Misplaced Tiles and
+        Manhattan Distance &mdash; and lets you step through every expansion.</p>
+
+        <div class="cta-row">
+          <a class="btn btn-primary" href="solver.html">Open the Solver &rarr;</a>
+          <a class="btn btn-ghost" href="info.html">Read the Algorithm Notes</a>
+        </div>
+      </div>
+
+      <div class="example-panel">
+        <div class="label">Example &mdash; initial state slides toward the goal</div>
+        <div class="example-boards">
+          <div class="board small" id="ex-initial"></div>
+          <span class="arrow">&rarr;</span>
+          <div class="board small" id="ex-goal"></div>
+        </div>
+        <p style="color:var(--text-dim); font-size:0.85rem; margin-top:16px;">
+          Only the blank tile's neighbours can move. Each slide costs 1, so the shortest solution is the
+          one with the fewest slides &mdash; exactly what A* guarantees when its heuristic never
+          overestimates the true cost.
+        </p>
+      </div>
+    </div>
+
+    <footer class="page-footer">
+      8-Puzzle A* Visualizer &middot; Artificial Intelligence Digital Assignment &middot; Gurpreet &middot; 24BCT0292
+    </footer>
+  </main>
+</div>
+
+<script>
+function renderMiniBoard(el, arr) {
+  el.innerHTML = '';
+  arr.forEach(v => {
+    const d = document.createElement('div');
+    d.className = 'tile' + (v === 0 ? ' blank' : '');
+    d.textContent = v === 0 ? '' : v;
+    el.appendChild(d);
+  });
+}
+renderMiniBoard(document.getElementById('ex-initial'), [2,8,3,1,6,4,7,0,5]);
+renderMiniBoard(document.getElementById('ex-goal'), [1,2,3,8,0,4,7,6,5]);
+</script>
+</body>
+</html>

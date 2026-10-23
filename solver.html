@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Solver &mdash; 8-Puzzle A* Visualizer</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="shell">
+  <aside class="railnav">
+    <div class="brand">AI · DIGITAL ASSIGNMENT<strong>8-Puzzle Visualizer</strong></div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="solver.html" class="active">Solver</a>
+      <a href="info.html">Algorithm Info</a>
+    </nav>
+    <div class="meta">Algorithm assigned:<br><span class="mono" style="color:var(--frontier)">A* Search</span></div>
+  </aside>
+
+  <main class="main">
+    <div class="hero">
+      <div class="eyebrow-line">Solver</div>
+      <h1>8-Puzzle &mdash; A* Search</h1>
+      <p class="lede">Enter or randomize a puzzle, pick a heuristic, run A*, then step through the frontier
+      and explored set expansion by expansion.</p>
+    </div>
+
+    <!-- ================= 1. PUZZLE INPUT ================= -->
+    <div class="panel">
+      <div class="section-title">1 &middot; Puzzle Input</div>
+
+      <div class="boards-row">
+        <div class="board-col">
+          <div class="board-label">Initial State (editable)</div>
+          <div class="board editable" id="board-initial-input"></div>
+        </div>
+        <div class="board-col">
+          <div class="board-label">Goal State (editable)</div>
+          <div class="board editable" id="board-goal-input"></div>
+        </div>
+      </div>
+
+      <div class="btn-row" style="margin-top:14px;">
+        <button class="btn" id="btn-random">Generate Random Puzzle</button>
+        <button class="btn btn-ghost" id="btn-check">Check Solvability</button>
+        <button class="btn btn-ghost" id="btn-reset-boards">Reset to Classic Example</button>
+      </div>
+
+      <div class="status-line" id="solvability-status"></div>
+    </div>
+
+    <!-- ================= 2. ALGORITHM / HEURISTIC ================= -->
+    <div class="panel">
+      <div class="section-title">2 &middot; Algorithm Selection</div>
+      <div class="field-row">
+        <div class="field">
+          <label>Algorithm</label>
+          <select disabled>
+            <option>A* Search (assigned algorithm)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Heuristic function h(n)</label>
+          <div class="radio-row">
+            <label><input type="radio" name="heuristic" value="manhattan" checked><span>Manhattan Distance</span></label>
+            <label><input type="radio" name="heuristic" value="misplaced"><span>Misplaced Tiles</span></label>
+          </div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="btn-solve">Solve with A*</button>
+      </div>
+    </div>
+
+    <!-- ================= 3. PUZZLE VISUALIZATION ================= -->
+    <div class="panel">
+      <div class="section-title">3 &middot; Puzzle Visualization</div>
+      <div class="boards-row">
+        <div class="board-col">
+          <div class="board-label">Initial</div>
+          <div class="board small" id="board-view-initial"></div>
+        </div>
+        <div class="board-col">
+          <div class="board-label">Current (node being expanded)</div>
+          <div class="board" id="board-view-current"></div>
+        </div>
+        <div class="board-col">
+          <div class="board-label">Goal</div>
+          <div class="board small" id="board-view-goal"></div>
+        </div>
+      </div>
+
+      <div class="controls-bar" style="margin-top:8px;">
+        <button class="btn" id="btn-run">Run</button>
+        <button class="btn" id="btn-pause">Pause</button>
+        <button class="btn" id="btn-resume">Resume</button>
+        <button class="btn" id="btn-prev">&larr; Previous Step</button>
+        <button class="btn" id="btn-next">Next Step &rarr;</button>
+        <button class="btn btn-ghost" id="btn-reset-run">Reset</button>
+        <div class="spacer"></div>
+        <div class="speed-row">
+          <label for="speed">Speed</label>
+          <input type="range" id="speed" min="1" max="10" value="5">
+        </div>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+      <div style="font-size:0.8rem; color:var(--text-faint); margin-top:8px;" id="step-readout">Step 0 / 0</div>
+    </div>
+
+    <!-- ================= 4. SEARCH PROCESS VISUALIZATION ================= -->
+    <div class="panel">
+      <div class="section-title">4 &middot; Search Process Visualization</div>
+      <div class="stat-grid">
+        <div class="stat-cell"><div class="k">Nodes Generated</div><div class="v" id="stat-generated">&mdash;</div></div>
+        <div class="stat-cell"><div class="k">Nodes Expanded</div><div class="v" id="stat-expanded">&mdash;</div></div>
+        <div class="stat-cell"><div class="k">Current Depth</div><div class="v" id="stat-depth">&mdash;</div></div>
+        <div class="stat-cell"><div class="k">Path Cost g(n)</div><div class="v" id="stat-g">&mdash;</div></div>
+        <div class="stat-cell"><div class="k">Heuristic h(n)</div><div class="v" id="stat-h">&mdash;</div></div>
+        <div class="stat-cell"><div class="k">Evaluation f(n)</div><div class="v" id="stat-f">&mdash;</div></div>
+      </div>
+
+      <div class="list-cols">
+        <div class="list-box">
+          <div class="head">Frontier (Open List) &mdash; best 8 by f(n)</div>
+          <div id="frontier-list"></div>
+        </div>
+        <div class="list-box">
+          <div class="head">Explored (Closed List) &mdash; most recent</div>
+          <div id="explored-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= 5. SOLUTION SUMMARY ================= -->
+    <div class="panel" id="summary-panel" style="display:none;">
+      <div class="section-title">5 &middot; Solution Summary</div>
+      <div class="stat-grid">
+        <div class="stat-cell"><div class="k">Result</div><div class="v" id="sum-found">&mdash;</div></div>
+        <div class="stat-cell"><div class="k">Total Moves</div><div class="v" id="sum-moves">&mdash;</div></div>
+        <div class="stat-cell"><div class="k">Nodes Generated</div><div class="v" id="sum-generated">&mdash;</div></div>
+        <div class="stat-cell"><div class="k">Nodes Expanded</div><div class="v" id="sum-expanded">&mdash;</div></div>
+        <div class="stat-cell"><div class="k">Max Search Depth</div><div class="v" id="sum-depth">&mdash;</div></div>
+        <div class="stat-cell"><div class="k">Execution Time</div><div class="v" id="sum-time">&mdash;</div></div>
+        <div class="stat-cell"><div class="k">Path Cost</div><div class="v" id="sum-cost">&mdash;</div></div>
+        <div class="stat-cell"><div class="k">Memory (approx.)</div><div class="v" id="sum-mem">&mdash;</div></div>
+      </div>
+
+      <div class="section-title" style="margin-top:22px;">Final Solution Path</div>
+      <div class="path-strip" id="path-strip"></div>
+    </div>
+
+  </main>
+</div>
+
+<script src="js/astar.js"></script>
+<script src="js/ui.js"></script>
+</body>
+</html>

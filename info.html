@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Algorithm Info &mdash; A* Search</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="shell">
+  <aside class="railnav">
+    <div class="brand">AI · DIGITAL ASSIGNMENT<strong>8-Puzzle Visualizer</strong></div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="solver.html">Solver</a>
+      <a href="info.html" class="active">Algorithm Info</a>
+    </nav>
+    <div class="meta">Algorithm assigned:<br><span class="mono" style="color:var(--frontier)">A* Search</span></div>
+  </aside>
+
+  <main class="main">
+    <div class="hero">
+      <div class="eyebrow-line">Algorithm Information</div>
+      <h1>A* Search</h1>
+      <p class="lede">An informed, best-first search that expands the node minimizing
+      <code>f(n) = g(n) + h(n)</code> &mdash; the cost already paid plus an estimate of the cost still owed.</p>
+    </div>
+
+    <div class="info-grid">
+      <div class="cell"><div class="k">Type</div><div class="v">Informed (heuristic) search, best-first</div></div>
+      <div class="cell"><div class="k">Evaluation function</div><div class="v">f(n) = g(n) + h(n)</div></div>
+      <div class="cell"><div class="k">Time complexity</div><div class="v">O(b<sup>d</sup>) worst case</div></div>
+      <div class="cell"><div class="k">Space complexity</div><div class="v">O(b<sup>d</sup>) &mdash; keeps every generated node</div></div>
+      <div class="cell"><div class="k">Completeness</div><div class="v">Complete on finite state spaces with positive step cost</div></div>
+      <div class="cell"><div class="k">Optimality</div><div class="v">Optimal when h(n) is admissible (and consistent for graph search)</div></div>
+    </div>
+
+    <div class="panel">
+      <h3><span class="dot"></span>Description</h3>
+      <p>A* Search is a graph-search algorithm that finds the lowest-cost path from a start state to a goal
+      state by combining two pieces of information at every candidate node: <code>g(n)</code>, the exact
+      cost of the path taken so far to reach node <code>n</code>, and <code>h(n)</code>, a heuristic
+      function estimating the cheapest remaining cost from <code>n</code> to the goal. At each step it
+      expands the node with the smallest <code>f(n) = g(n) + h(n)</code> from the frontier, which lets it
+      combine the guaranteed optimality of Uniform Cost Search with the speed of a well-informed
+      Greedy Best-First Search.</p>
+    </div>
+
+    <div class="panel">
+      <h3><span class="dot"></span>Working Principle</h3>
+      <p>The frontier (open list) is kept as a priority queue ordered by <code>f(n)</code>. On each
+      iteration:</p>
+      <ol style="color:var(--text-dim)">
+        <li>Pop the node with the lowest <code>f(n)</code> from the frontier and move it to the explored
+        set (closed list). If it is the goal state, stop &mdash; the path reconstructed by following parent
+        pointers back to the start is the solution.</li>
+        <li>Otherwise, generate its successors by sliding the blank tile into each adjacent position.</li>
+        <li>For each successor, compute <code>g(n) = g(parent) + 1</code> (each slide costs 1) and
+        <code>h(n)</code> using the selected heuristic, then push it onto the frontier &mdash; unless a
+        cheaper path to that same state is already known, in which case it is skipped or updated
+        (relaxed).</li>
+        <li>Repeat until the goal is popped from the frontier or the frontier is empty (no solution).</li>
+      </ol>
+      <p>In this implementation the frontier is a binary min-heap keyed on <code>(f, h)</code>, and two
+      heuristics are selectable:</p>
+      <ul style="color:var(--text-dim)">
+        <li><strong>Misplaced Tiles</strong> &mdash; counts tiles that are not in their goal position
+        (blank excluded). Admissible because every misplaced tile needs at least one move to be fixed.</li>
+        <li><strong>Manhattan Distance</strong> &mdash; sums, over every tile, the number of grid rows plus
+        columns it is away from its goal position. Admissible and dominates Misplaced Tiles (it is always
+        &ge; Misplaced Tiles), so it typically expands far fewer nodes.</li>
+      </ul>
+    </div>
+
+    <div class="panel">
+      <h3><span class="dot"></span>Advantages</h3>
+      <ul style="color:var(--text-dim)">
+        <li>Guarantees the shortest (least-cost) solution when the heuristic is admissible.</li>
+        <li>Expands far fewer nodes than uninformed strategies like BFS or Uniform Cost Search, because the
+        heuristic actively guides the search toward the goal instead of exploring uniformly outward.</li>
+        <li>Flexible: swapping in a better (tighter) admissible heuristic, such as Manhattan Distance over
+        Misplaced Tiles, immediately improves performance without changing the algorithm itself.</li>
+      </ul>
+    </div>
+
+    <div class="panel">
+      <h3><span class="dot"></span>Limitations</h3>
+      <ul style="color:var(--text-dim)">
+        <li>Space complexity is exponential in the worst case &mdash; every generated node is kept in memory,
+        which becomes the practical bottleneck long before time does.</li>
+        <li>Solution quality depends entirely on the heuristic: a poor or inadmissible heuristic can make A*
+        behave like an uninformed search, or even return a suboptimal solution.</li>
+        <li>Computing the heuristic adds per-node overhead, which can outweigh the benefit on very shallow
+        or trivially small search spaces.</li>
+      </ul>
+    </div>
+
+    <footer class="page-footer">
+      8-Puzzle A* Visualizer &middot; Artificial Intelligence Digital Assignment &middot; Gurpreet &middot; 24BCT0292
+    </footer>
+  </main>
+</div>
+</body>
+</html>
